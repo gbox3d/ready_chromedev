@@ -1,0 +1,6 @@
+node_modules/
+_archive/
+
+# Claude Code 로컬 상태. .mcp.json 서버의 승인 기록이 여기 남는다.
+# 커밋하면 클론한 사람의 승인 관문이 사라지므로 제외한다.
+.claude/
