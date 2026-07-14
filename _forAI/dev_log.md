@@ -6,63 +6,66 @@
 
 ## Entries
 
-### 2026-07-09 — `_forAI` 문서 세트 생성
+### 2026-07-09 (3) — 저장소를 "설치법 + 확인법"으로 축소
 
-`README.md`, `inventory.md`, `memo.md`, `plan.md`, `dev_log.md` 신규 생성.
-사용자 요청: "지금까지 알아본 방법론들을 정리하고, MCP 개념을 익히며 실험해보고 싶다."
+**요청**: "교재고 뭐고 강의고 뭐고 중요치 않습니다. 설치법하고 확인만 하면 됩니다. 나머지 다 지워버리세요."
 
-### 2026-07-09 — Chrome MCP 조사·실험 (첫날)
+**한 일**
 
-**요청**: Chrome MCP 특강 준비 (Windows 11, 설치 → 개발 응용). 주제는 "AI와 인간의 소통·공감".
+- 삭제 직전 상태를 커밋 `cd8c714` 로 박아 두었다. 그 전까지 이 저장소는 **커밋이 0개**였고,
+  그날 오전에 사라진 `demo/`, `scripts/`, `slides/`, `_archive/` 는 이미 복구 불가였다.
+- `docs/chrome-mcp-guide.md` (299줄) 삭제. 커밋에서 꺼낼 수 있다.
+- `.claude/` 삭제하고 `.gitignore` 에 추가. 그 안에는 `.mcp.json` 서버의 승인 기록
+  (`enabledMcpjsonServers: ["chrome-devtools"]`) 만 들어 있었다.
+  커밋되면 클론한 사람의 승인 관문이 사라지므로 제외한다.
+- `readme.md` 를 설치법 + 확인법으로 재작성. `_forAI/` 4개 문서를 같은 범위로 축소.
 
-**실제로 한 일과 결과**
+**남은 구성**: `.mcp.json` · `readme.md` · `_forAI/` · `.gitignore`
 
-- `chrome-devtools-mcp@1.5.0` 을 직접 spawn 해 JSON-RPC 로 대화. 도구 29개, protocol `2025-06-18` 확인.
-- 버전 협상 실측: 서버가 구버전으로 내려와서 답하고, 엉터리 버전에도 에러를 내지 않는다.
-- 데모 웹앱 제작: **렌더링해야만 존재하는 버그** (투명 `.ribbon` 오버레이가 클릭을 삼킴).
-  6개 뷰포트에서 31px 여유로 결정적 재현.
-- `emulate` 실측: LCP 946ms → 43,354ms (Slow 3G + CPU 4x). 46배.
-- `--browserUrl` attach 실측: UA 에 `HeadlessChrome` 없음 = 사람이 보는 실제 창.
-- Chrome for Testing 다운로드 없음 확인 (npx 캐시 36MB).
+---
 
-**되돌아본 실패**
+### 2026-07-09 (2) — MCP 등록 스코프를 project 하나로 확정
 
-1. **아키텍처를 잘못 골랐다.** 사용자는 "내 로그인 브라우저를 같이 보는" 구조(언리얼 플러그인처럼)를
-   원했는데, 나는 "AI가 자기 브라우저를 띄워 진단하는" CDP 방식만 밀었다.
-   **"누구의 브라우저를 보느냐"를 처음에 묻지 않았다.**
-   나중에 이 머신에 이미 Claude Code Chrome 확장(`--chrome`)이 깔려 있다는 것을 발견했다.
+**증상**: `chrome-devtools` 가 `myAISkills` 루트로 연 세션에서 보이지 않았다.
 
-2. **주제를 과잉 해석했다.** 사용자가 말한 "공감"은 *소통의 대역폭을 극한까지 끌어올린다* 는
-   공학적 개념이었는데, 접근성/장애인 서사와 인문학 인용(Stein, Turkle, Bender, Dennett)으로 끌고 가
-   "심파조"가 되었다. 사용자 지적: *"공학의 탈을 쓴 정치쇼"*.
-   → `take_snapshot` 이 a11y 트리를 쓰는 이유는 도덕이 아니라 공학이다 (의미론적·안정적·저토큰).
-   Playwright MCP 도 같은 이유로 같은 것을 쓴다.
+**원인**: 등록이 `~/.claude.json` 의 `projects["C:/works/ready_chromedev"].mcpServers` (local scope)
+아래에만 있었다. 다른 프로젝트를 루트로 연 세션은 그 서랍을 열지 않는다.
+`--add-dir` 로 붙인 추가 작업 디렉터리는 루트가 아니므로 그 폴더의 `.mcp.json` 도 읽히지 않는다.
 
-3. **분량을 잘못 잡았다.** 150분 워크숍으로 만들었으나 실제로는 **20분** 강의가 맞았다.
+**해결 과정에서 확인한 것**
 
-4. **눈먼 AI 실험이 전제를 반증했다.** 파일 읽기 + Bash 만 가진 에이전트가 헤드리스 Chrome 을 띄우고
-   CDP 드라이버를 직접 작성해 버그를 찾아 고쳤다 (도구 호출 16회, 확신도 99%).
-   → "눈먼 AI 는 못 고친다"는 거짓. 참인 명제는 "지각 없이는 확신할 수 없고, 없으면 스스로 만들어낸다".
+- **`-s user` 로 옮기면 루트와 무관하게 로드된다.** 실제로 붙었다. 그러나 모든 프로젝트를 오염시킨다.
+  최종적으로 되돌리고 `.mcp.json` (project scope) 하나만 남겼다.
+- **재시작이 필요했다.** 등록 직후에는 도구가 세션에 없었다. 사용자가 세션을 재시작한 뒤에야
+  `mcp__chrome-devtools__*` 30개가 붙었다. (중간에 "재시작 없이 붙었다"고 잘못 결론 내렸다가
+  사용자가 "마지막에 재시작한 겁니다"라고 바로잡아 정정했다. 관측하지 않은 전제를 사실로 깔았던 오류.)
+- **`claude mcp list` 와 `/mcp` 는 다른 것을 본다.** 전자는 별도 프로세스를 새로 띄워 헬스체크한다.
+  `✔ Connected` 를 보고 "이 세션에서 쓸 수 있다"고 결론내면 틀린다.
+  실제로 `unreal-mcp` 가 `list` 에서는 초록인데 세션 도구 목록에는 없었다.
 
-**만들면서 잡은 실제 버그 3개** (전부 렌더링/실행해야만 보이는 것들)
+**밟은 지뢰**
 
-- `preflight.ps1` 이 BOM 없이 저장되어 PowerShell 5.1 에서 한글이 깨지고 파서가 죽었는데도
-  **"모두 통과"** 를 출력했다. 거짓 통과. → BOM 추가 + 종료코드 수정.
-- 슬라이드의 46배 막대그래프가 통째로 렌더링되지 않았다.
-  `<span class="bar-fill">` 에 `display:block` 이 없어서 (비치환 인라인 요소는 width 무시).
-- 같은 슬라이드에서 두 막대의 트랙 길이가 서로 달랐다. 길이 비교 그래프의 기준선 어긋남.
+`claude mcp add ... -- cmd /c npx ...` 를 **Git Bash** 에서 실행했더니 MSYS 경로 변환이
+`/c` 를 `C:/` 로 바꿔 `args: ["C:/", "npx", ...]` 가 저장됐다. 조용히 망가진다.
+PowerShell 로 다시 등록해 고쳤다.
 
-**산출물**
+**검증**
 
-- `demo/` (데모 웹앱 + 검증 스크립트 7종)
-- `scripts/preflight.ps1`, `scripts/check-browser.mjs`
-- `docs/lecture-plan.md` (150분판 — 과잉, 20분판으로 재작성 필요)
-- `slides/` (19장, Artifact 배포: `https://claude.ai/code/artifact/7449c14c-556a-406a-9316-cf89f626d525`)
+`ready_chromedev` 루트에서 `claude mcp list` → `chrome-devtools ✔ Connected`.
+`mcp__chrome-devtools__list_pages` 실제 호출 → `about:blank` 응답. 동작 확인.
 
-**미검증으로 남긴 것**
+---
 
-- Claude Code `--chrome` 통합이 노출하는 도구 (실험 1)
-- Playwright MCP `--extension` 실제 동작 (실험 2)
-- `--autoConnect` 로 기본 프로필 접속 가능 여부 (실험 3)
-- WebMCP (실험 5)
-- `unreal-mcp` 는 `127.0.0.1:8000` 미기동으로 연결 실패 상태
+### 2026-07-09 (1) — Chrome MCP 조사·실험 (첫날)
+
+`chrome-devtools-mcp@1.5.0` 을 직접 spawn 해 JSON-RPC 로 대화. 도구 29개, protocol `2025-06-18` 확인.
+데모 웹앱과 검증 스크립트, 강의안, 슬라이드를 만들었으나 **범위가 과했다.**
+이날의 산출물은 전부 삭제됐고, 마지막 상태는 커밋 `cd8c714` 에 있다.
+
+이때 얻은 사실 중 살아남은 것:
+
+- Windows 에서 `"command": "npx"` 는 `spawn npx ENOENT` 로 죽는다. `cmd /c` 래핑이 필요하다.
+  (대조 실험으로 확인. 터미널에서 `npx --version` 이 도는 것은 셸을 거치는 경로라 증거가 되지 못한다.)
+- `chrome-devtools-mcp` 는 Chrome for Testing 을 내려받지 않는다. 설치된 Chrome 을 쓴다.
+- 기본 모드의 프로필은 "깨끗한 임시 프로필"이 아니라 **별도이지만 지속되는** 프로필이다.
+- Chrome 136+ 는 기본 프로필의 `--remote-debugging-port` 를 조용히 무시한다.
