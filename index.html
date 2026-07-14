@@ -1,35 +1,33 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Chrome 브라우저 협업 제어 시연용 삼목 게임" />
-    <title>삼목 · Chrome 협업 데모</title>
-    <link rel="stylesheet" href="style.css?v=5" />
+    <meta name="description" content="A tic-tac-toe demo for Chrome MCP collaboration control" />
+    <title>Tic-Tac-Toe · Chrome MCP Demo</title>
+    <link rel="stylesheet" href="style.css?v=6" />
     <script src="script.js" defer></script>
   </head>
   <body>
     <main class="app-shell">
       <section class="intro-panel">
         <p class="eyebrow">CHROME COLLABORATION DEMO</p>
-        <h1>삼목을 함께 둬보세요<span class="accent">.</span></h1>
         <p class="intro-copy">
-          이교수님은 <strong class="x-text">X</strong>, Chrome 협력자는
-          <strong class="o-text">O</strong>입니다. 브라우저를 제어하는 협력자가
-          빈 칸을 직접 눌러 다음 수를 둘 수 있습니다.
+          <strong class="x-text">Human</strong> plays X. <strong class="o-text">AI</strong>
+          plays O. A browser-control agent can click an empty cell to make its move.
         </p>
         <div class="demo-note">
           <span class="pulse-dot" aria-hidden="true"></span>
-          <span>정적 페이지 · 별도 서버와 로그인 없이 동작</span>
+          <span>Static page · no server or sign-in required</span>
         </div>
       </section>
 
-      <section class="game-layout" aria-label="삼목 게임">
+      <section class="game-layout" aria-label="Tic-tac-toe game">
         <div class="game-card">
           <div class="game-card-header">
             <div>
               <p class="section-label">LIVE BOARD</p>
-              <h2>협업 게임판</h2>
+              <h2>Shared Board</h2>
             </div>
             <span class="round-badge" id="round-badge">ROUND 01</span>
           </div>
@@ -37,25 +35,25 @@
           <div class="turn-indicator" id="turn-indicator" aria-live="polite">
             <span class="turn-mark x-mark">X</span>
             <div>
-              <span class="turn-label">현재 차례</span>
-              <strong id="turn-text">이교수님</strong>
+              <span class="turn-label">Current turn</span>
+              <strong id="turn-text">Human</strong>
             </div>
           </div>
 
-          <div class="board" id="board" role="grid" aria-label="삼목 게임판">
-            <button class="cell" type="button" data-index="0" aria-label="1번 칸, 비어 있음"></button>
-            <button class="cell" type="button" data-index="1" aria-label="2번 칸, 비어 있음"></button>
-            <button class="cell" type="button" data-index="2" aria-label="3번 칸, 비어 있음"></button>
-            <button class="cell" type="button" data-index="3" aria-label="4번 칸, 비어 있음"></button>
-            <button class="cell" type="button" data-index="4" aria-label="5번 칸, 비어 있음"></button>
-            <button class="cell" type="button" data-index="5" aria-label="6번 칸, 비어 있음"></button>
-            <button class="cell" type="button" data-index="6" aria-label="7번 칸, 비어 있음"></button>
-            <button class="cell" type="button" data-index="7" aria-label="8번 칸, 비어 있음"></button>
-            <button class="cell" type="button" data-index="8" aria-label="9번 칸, 비어 있음"></button>
+          <div class="board" id="board" role="grid" aria-label="Tic-tac-toe board">
+            <button class="cell" type="button" data-index="0" aria-label="Cell 1, empty"></button>
+            <button class="cell" type="button" data-index="1" aria-label="Cell 2, empty"></button>
+            <button class="cell" type="button" data-index="2" aria-label="Cell 3, empty"></button>
+            <button class="cell" type="button" data-index="3" aria-label="Cell 4, empty"></button>
+            <button class="cell" type="button" data-index="4" aria-label="Cell 5, empty"></button>
+            <button class="cell" type="button" data-index="5" aria-label="Cell 6, empty"></button>
+            <button class="cell" type="button" data-index="6" aria-label="Cell 7, empty"></button>
+            <button class="cell" type="button" data-index="7" aria-label="Cell 8, empty"></button>
+            <button class="cell" type="button" data-index="8" aria-label="Cell 9, empty"></button>
           </div>
 
           <div class="result-banner" id="result-banner" aria-live="polite" hidden></div>
-          <button class="reset-button" id="reset-button" type="button">새 게임 시작</button>
+          <button class="reset-button" id="reset-button" type="button">New Game</button>
         </div>
 
         <aside class="side-panel">
@@ -64,21 +62,21 @@
             <div class="score-row">
               <div class="score-player">
                 <span class="score-symbol x-text">X</span>
-                <span>이교수님</span>
+                <span>Human</span>
               </div>
               <strong id="x-score">0</strong>
             </div>
             <div class="score-row">
               <div class="score-player">
                 <span class="score-symbol o-text">O</span>
-                <span>Chrome 협력자</span>
+                <span>AI</span>
               </div>
               <strong id="o-score">0</strong>
             </div>
             <div class="score-row draws-row">
               <div class="score-player">
                 <span class="score-symbol draw-text">=</span>
-                <span>무승부</span>
+                <span>Draw</span>
               </div>
               <strong id="draw-score">0</strong>
             </div>
@@ -90,7 +88,7 @@
               <span id="move-count">0 moves</span>
             </div>
             <ol class="move-list" id="move-list">
-              <li class="empty-log">첫 번째 수를 기다리는 중입니다.</li>
+              <li class="empty-log">Waiting for the first move.</li>
             </ol>
           </div>
         </aside>
@@ -99,7 +97,7 @@
       <footer>
         <span>READY_CHROMEDEV</span>
         <span aria-hidden="true">·</span>
-        <span>브라우저 협업 제어 테스트</span>
+        <span>Browser collaboration control test</span>
       </footer>
     </main>
   </body>

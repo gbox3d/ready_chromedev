@@ -14,7 +14,7 @@ const winningLines = [
   [0, 3, 6], [1, 4, 7], [2, 5, 8],
   [0, 4, 8], [2, 4, 6],
 ];
-const cellNames = ['1번', '2번', '3번', '4번', '5번', '6번', '7번', '8번', '9번'];
+const cellNames = ['Cell 1', 'Cell 2', 'Cell 3', 'Cell 4', 'Cell 5', 'Cell 6', 'Cell 7', 'Cell 8', 'Cell 9'];
 
 let game = { board: Array(9).fill(''), current: 'X', moves: [], over: false };
 let round = 1;
@@ -24,7 +24,7 @@ function getWinner() {
 }
 
 function playerName(mark) {
-  return mark === 'X' ? '이교수님' : 'Chrome 협력자';
+  return mark === 'X' ? 'Human' : 'AI';
 }
 
 function updateTurn() {
@@ -38,7 +38,7 @@ function updateTurn() {
 function renderHistory() {
   moveCount.textContent = `${game.moves.length} moves`;
   if (!game.moves.length) {
-    moveList.innerHTML = '<li class="empty-log">첫 번째 수를 기다리는 중입니다.</li>';
+    moveList.innerHTML = '<li class="empty-log">Waiting for the first move.</li>';
     return;
   }
   moveList.innerHTML = game.moves.map((move, index) => `
@@ -52,7 +52,7 @@ function renderBoard() {
     cell.textContent = mark;
     cell.className = `cell${mark ? ` ${mark.toLowerCase()}` : ''}`;
     cell.disabled = Boolean(mark) || game.over;
-    cell.setAttribute('aria-label', `${cellNames[index]} 칸, ${mark ? `${mark} (${playerName(mark)})` : '비어 있음'}`);
+    cell.setAttribute('aria-label', `${cellNames[index]}, ${mark ? `${mark} (${playerName(mark)})` : 'empty'}`);
   });
   updateTurn();
   renderHistory();
@@ -63,11 +63,11 @@ function finishGame(winner) {
   if (winner) {
     scores[winner.mark] += 1;
     winner.line.forEach((index) => cells[index].classList.add('winner'));
-    resultBanner.textContent = `${playerName(winner.mark)}의 승리입니다!`;
+    resultBanner.textContent = `${playerName(winner.mark)} wins!`;
     resultBanner.className = 'result-banner';
   } else {
     scores.draw += 1;
-    resultBanner.textContent = '무승부입니다. 빈 칸이 없습니다.';
+    resultBanner.textContent = 'Draw. No empty cells remain.';
     resultBanner.className = 'result-banner draw';
   }
   resultBanner.hidden = false;

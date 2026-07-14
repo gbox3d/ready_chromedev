@@ -113,12 +113,12 @@ Do not stop between turns or ask me what to do next.
 Keep using MCP until the game ends with a win or a draw.
 
 Rules:
-1. If the current game is already over, click "새 게임 시작" once.
+1. If the current game is already over, click "New Game" once.
    Do not reset an already empty board.
 2. Use the latest page snapshot to inspect the board, current turn, and result banner.
 3. Never click any board cell before I have placed X.
-4. When it is "이교수님"'s turn, poll the board every second and wait.
-5. After my new X move is detected and it becomes "Chrome 협력자"'s turn,
+4. When it is "Human"'s turn, poll the board every second and wait.
+5. After my new X move is detected and it becomes "AI"'s turn,
    choose exactly one empty cell and click it as O.
 6. Never place X on my behalf and never treat an unobserved move as my X move.
 7. Always use a fresh snapshot before clicking. Never click an occupied cell.
