@@ -114,8 +114,8 @@ footer { display: flex; gap: 10px; margin-top: 34px; font-size: 0.65rem; }
   .game-card { padding: 18px 24px; }
   .game-card-header h2 { font-size: 1.3rem; }
   .turn-indicator { min-height: 46px; margin: 14px 0 12px; }
-  .board { width: min(100%, clamp(160px, calc(100vh - 438px), 520px)); }
-  .cell { min-height: 0; }
+  .board { width: min(100%, clamp(160px, calc(100vh - 438px), 520px)); grid-template-rows: repeat(3, minmax(0, 1fr)); }
+  .cell { min-height: 0; font-size: clamp(1.6rem, 3.5vw, 2.3rem); }
   .score-card, .history-card { padding: 18px; }
   .score-card > .section-label { margin-bottom: 10px; }
   .score-row { padding: 8px 0; }
