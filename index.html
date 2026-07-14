@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Chrome 브라우저 협업 제어 시연용 삼목 게임" />
+    <title>삼목 · Chrome 협업 데모</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="intro-panel">
+        <p class="eyebrow">CHROME COLLABORATION DEMO</p>
+        <h1>삼목을 함께 둬보세요<span class="accent">.</span></h1>
+        <p class="intro-copy">
+          이교수님은 <strong class="x-text">X</strong>, Chrome 협력자는
+          <strong class="o-text">O</strong>입니다. 브라우저를 제어하는 협력자가
+          빈 칸을 직접 눌러 다음 수를 둘 수 있습니다.
+        </p>
+        <div class="demo-note">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          <span>정적 페이지 · 별도 서버와 로그인 없이 동작</span>
+        </div>
+      </section>
+
+      <section class="game-layout" aria-label="삼목 게임">
+        <div class="game-card">
+          <div class="game-card-header">
+            <div>
+              <p class="section-label">LIVE BOARD</p>
+              <h2>협업 게임판</h2>
+            </div>
+            <span class="round-badge" id="round-badge">ROUND 01</span>
+          </div>
+
+          <div class="turn-indicator" id="turn-indicator" aria-live="polite">
+            <span class="turn-mark x-mark">X</span>
+            <div>
+              <span class="turn-label">현재 차례</span>
+              <strong id="turn-text">이교수님</strong>
+            </div>
+          </div>
+
+          <div class="board" id="board" role="grid" aria-label="삼목 게임판">
+            <button class="cell" type="button" data-index="0" aria-label="1번 칸, 비어 있음"></button>
+            <button class="cell" type="button" data-index="1" aria-label="2번 칸, 비어 있음"></button>
+            <button class="cell" type="button" data-index="2" aria-label="3번 칸, 비어 있음"></button>
+            <button class="cell" type="button" data-index="3" aria-label="4번 칸, 비어 있음"></button>
+            <button class="cell" type="button" data-index="4" aria-label="5번 칸, 비어 있음"></button>
+            <button class="cell" type="button" data-index="5" aria-label="6번 칸, 비어 있음"></button>
+            <button class="cell" type="button" data-index="6" aria-label="7번 칸, 비어 있음"></button>
+            <button class="cell" type="button" data-index="7" aria-label="8번 칸, 비어 있음"></button>
+            <button class="cell" type="button" data-index="8" aria-label="9번 칸, 비어 있음"></button>
+          </div>
+
+          <div class="result-banner" id="result-banner" aria-live="polite" hidden></div>
+          <button class="reset-button" id="reset-button" type="button">새 게임 시작</button>
+        </div>
+
+        <aside class="side-panel">
+          <div class="score-card">
+            <p class="section-label">SCOREBOARD</p>
+            <div class="score-row">
+              <div class="score-player">
+                <span class="score-symbol x-text">X</span>
+                <span>이교수님</span>
+              </div>
+              <strong id="x-score">0</strong>
+            </div>
+            <div class="score-row">
+              <div class="score-player">
+                <span class="score-symbol o-text">O</span>
+                <span>Chrome 협력자</span>
+              </div>
+              <strong id="o-score">0</strong>
+            </div>
+            <div class="score-row draws-row">
+              <div class="score-player">
+                <span class="score-symbol draw-text">=</span>
+                <span>무승부</span>
+              </div>
+              <strong id="draw-score">0</strong>
+            </div>
+          </div>
+
+          <div class="history-card">
+            <div class="history-header">
+              <p class="section-label">MOVE LOG</p>
+              <span id="move-count">0 moves</span>
+            </div>
+            <ol class="move-list" id="move-list">
+              <li class="empty-log">첫 번째 수를 기다리는 중입니다.</li>
+            </ol>
+          </div>
+        </aside>
+      </section>
+
+      <footer>
+        <span>READY_CHROMEDEV</span>
+        <span aria-hidden="true">·</span>
+        <span>브라우저 협업 제어 테스트</span>
+      </footer>
+    </main>
+  </body>
+</html>
