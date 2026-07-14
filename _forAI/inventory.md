@@ -14,13 +14,14 @@
 - Name: `ready_chromedev`
 - Path: `c:\works\ready_chromedev`
 - git: 브랜치 `master`. 커밋 1개 — `cd8c714` "정리 전 스냅샷".
-- Summary: **`chrome-devtools-mcp` 설치법과 확인법만 담는 저장소.** 코드는 없다.
+- Summary: **`chrome-devtools-mcp`의 프로젝트·전역 등록과 확인법을 담는 저장소.**
 
 ## Top-level structure
 
 ```
 .mcp.json     chrome-devtools MCP 서버 등록 (project scope). 이 저장소의 전부다.
-readme.md     설치법 + 확인법.
+readme.md     Windows·macOS·Ubuntu 설치법 + 확인법.
+scripts/      Codex 전역 등록 스크립트 (Windows, macOS·Ubuntu).
 _forAI/       이 문서 세트.
 .gitignore    node_modules/, _archive/, .claude/
 ```
@@ -46,6 +47,13 @@ _forAI/       이 문서 세트.
 - Windows 에서 `cmd /c` 래핑은 **필수**다. Claude Code 는 셸 없이 `spawn()` 하므로
   `"command": "npx"` 는 `spawn npx ENOENT` 로 죽는다.
 
+Codex 전역 등록:
+
+- Windows: `scripts/Register-CodexChromeDevToolsMcp.ps1`
+- macOS·Ubuntu: `scripts/register-codex-chrome-devtools-mcp.sh`
+- 저장 위치: `~/.codex/config.toml` (`CODEX_HOME`을 설정했으면 그 경로)
+- Codex 전역 등록은 상위 폴더를 VS Code 작업 루트로 열어도 MCP를 쓰기 위한 의도적인 결정이다.
+
 ## 확인 명령
 
 ```powershell
@@ -54,6 +62,9 @@ npx -y chrome-devtools-mcp@latest --version     # 2026-07-09 기준 1.5.0
 
 # 2) 등록/연결 헬스체크 — 반드시 이 저장소를 루트로
 claude mcp list                                 # chrome-devtools: ✔ Connected
+
+# 3) Codex 전역 등록 확인 — 어느 폴더에서나
+codex mcp list                                  # chrome-devtools ... enabled
 ```
 
 세션 안에서는 `/mcp` 로 본다. **`claude mcp list` 와 `/mcp` 는 다른 것을 본다.**
@@ -62,7 +73,10 @@ claude mcp list                                 # chrome-devtools: ✔ Connected
 
 ## Tests
 
-없다. 코드가 없다.
+- Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Register-CodexChromeDevToolsMcp.ps1`
+  를 재실행해 멱등 동작을 확인했다 (2026-07-14).
+- macOS·Ubuntu: 현지에서 `bash -n scripts/register-codex-chrome-devtools-mcp.sh` 후 스크립트를
+  실행해 확인해야 한다. 이 Windows 환경에는 Bash/WSL 배포판이 없었다.
 
 ## Notes
 
@@ -70,3 +84,4 @@ claude mcp list                                 # chrome-devtools: ✔ Connected
 - `@latest` 를 쓰므로 버전이 조용히 올라간다. 도구 개수·이름은 `/mcp` 로 확인할 것.
 - 2026-07-09 저장소를 대폭 축소했다. `demo/`, `scripts/`, `slides/`, `docs/` 삭제.
   삭제 직전 상태는 커밋 `cd8c714` 에 전부 들어 있다. 필요하면 거기서 꺼낸다.
+- 2026-07-14 Codex 전역 등록 스크립트 두 개를 `scripts/`에 다시 추가했다.

@@ -10,14 +10,13 @@
 
 ## Current goal
 
-**`chrome-devtools-mcp` 를 설치하고, 붙었는지 확인하는 법을 정확히 문서화한다.**
+**`chrome-devtools-mcp`를 프로젝트와 Codex 전역에서 등록하고, 붙었는지 확인하는 법을 정확히 문서화한다.**
 
 그 이상은 이 저장소의 범위가 아니다. 강의안·방법론 비교·데모 코드는 2026-07-09 에 걷어냈다.
 
 ## Near-term work
 
-1. `readme.md` 의 설치법을 **깨끗한 환경에서 한 번 처음부터 따라해 본다.**
-   현재 문서는 이미 설치된 상태에서 역으로 정리한 것이다.
+1. macOS 또는 Ubuntu의 깨끗한 환경에서 Bash 전역 등록 스크립트를 한 번 처음부터 따라해 본다.
 2. 새 세션에서 `.mcp.json` 승인 프롬프트가 실제로 뜨는지 확인한다
    (`.claude/` 를 지웠으므로 다음 세션에 한 번 떠야 한다).
 
@@ -31,8 +30,11 @@
 
 ## Structure decisions
 
-- **등록은 `.mcp.json` (project scope) 하나만.** `-s user` 와 `-s local` 등록은 2026-07-09 제거했다.
-  user scope 는 모든 프로젝트를 오염시킨다.
+- **Claude Code는 `.mcp.json` (project scope) 하나만 사용한다.** `-s user`와 `-s local` 등록은
+  2026-07-09 제거했다. user scope는 모든 프로젝트를 오염시킨다.
+- **Codex는 사용자 전역 MCP 등록을 사용한다.** VS Code에서 상위 폴더를 작업 루트로 열어도
+  Chrome DevTools MCP를 쓰기 위한 2026-07-14 결정이다. 프로젝트 `.codex/config.toml`은
+  저장소 루트 사용을 위한 예시로 유지한다.
 - **`.claude/` 는 커밋하지 않는다.** 승인 기록이며, 커밋하면 클론한 사람의 승인 관문이 사라진다.
 - 코드를 다시 들이지 않는다. 검증이 필요하면 명령 한 줄로 끝나야 한다.
 

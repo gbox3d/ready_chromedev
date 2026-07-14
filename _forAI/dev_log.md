@@ -6,6 +6,38 @@
 
 ## Entries
 
+### 2026-07-14 (4) — Codex 전역 Chrome DevTools MCP 등록으로 전환
+
+**시간**: 2026-07-14 14:51:31 +09:00
+
+**배경**: 상위 폴더를 VS Code 작업 루트로 연 Codex 세션에서는 이 저장소의 프로젝트 설정이
+로드되지 않았다. Chrome을 별도 프로필과 `--auto-open-devtools-for-tabs`로 직접 실행한
+검증은 성공했으므로 Chrome 설치 문제가 아니라 Codex 설정 스코프 문제로 확정했다.
+
+**결정**: 이전의 “전역 등록을 쓰지 않는다”는 원칙을 Codex에 한해 철회했다. Claude Code는
+프로젝트 `.mcp.json`을 그대로 사용하고, Codex는 사용자 전역 `~/.codex/config.toml`에
+`chrome-devtools`를 등록한다.
+
+**한 일**
+
+- Windows용 `scripts/Register-CodexChromeDevToolsMcp.ps1` 추가.
+  - 동일한 전역 등록이면 변경하지 않고, 다른 등록을 교체할 때만 `-Force`를 요구한다.
+- macOS·Ubuntu 공용 `scripts/register-codex-chrome-devtools-mcp.sh` 추가.
+  - `npx -y chrome-devtools-mcp@latest`를 전역 Codex MCP로 등록하며, 교체 옵션은 `--force`다.
+- `readme.md`에 OS별 등록·교체·검증 명령과 macOS·Ubuntu 프로젝트 설정 예시를 추가했다.
+- `memo.md`, `inventory.md`, `plan.md`를 새 전역 등록 결정에 맞게 갱신했다.
+
+**검증**
+
+- 저장소 밖(`C:\`)에서 `codex mcp get chrome-devtools`와 `codex mcp list`를 실행해
+  `cmd /c npx -y chrome-devtools-mcp@latest` 전역 등록이 `enabled`인 것을 확인했다.
+- Windows 스크립트를 재실행해 “already registered”로 종료하는 멱등 동작을 확인했다.
+- 이 Windows 환경에는 Bash와 설치된 WSL 배포판이 없어 macOS·Ubuntu 스크립트의 현지 실행은
+  검증하지 못했다. 해당 환경에서는 `bash -n scripts/register-codex-chrome-devtools-mcp.sh`와
+  스크립트 실행으로 한 번 확인할 것.
+
+---
+
 ### 2026-07-09 (3) — 저장소를 "설치법 + 확인법"으로 축소
 
 **요청**: "교재고 뭐고 강의고 뭐고 중요치 않습니다. 설치법하고 확인만 하면 됩니다. 나머지 다 지워버리세요."
