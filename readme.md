@@ -31,43 +31,25 @@ Codex 전역 등록이 필요합니다.
 
 ## Codex 전역 등록 (VS Code에서 권장)
 
-이 저장소가 아닌 폴더를 VS Code의 작업 루트로 열어도 `chrome-devtools`를 쓰려면,
-사용 중인 운영체제에서 다음 스크립트를 **한 번만** 실행합니다.
+이 저장소가 아닌 폴더를 VS Code 작업 루트로 열어도 `chrome-devtools`를 쓰려면,
+다음 명령을 **한 번만** 실행합니다.
 
-| 운영체제 | 실행 명령 |
-|:--|:--|
-| Windows (PowerShell) | `.\scripts\Register-CodexChromeDevToolsMcp.ps1` |
-| macOS / Ubuntu (Bash) | `chmod +x ./scripts/register-codex-chrome-devtools-mcp.sh`<br>`./scripts/register-codex-chrome-devtools-mcp.sh` |
-
-Windows PowerShell 예시:
+Windows PowerShell:
 
 ```powershell
-.\scripts\Register-CodexChromeDevToolsMcp.ps1
+codex mcp add chrome-devtools -- cmd /c npx -y chrome-devtools-mcp@latest
 ```
 
-macOS 또는 Ubuntu 예시:
+macOS·Linux:
 
 ```bash
-chmod +x ./scripts/register-codex-chrome-devtools-mcp.sh
-./scripts/register-codex-chrome-devtools-mcp.sh
+codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@latest
 ```
 
-PowerShell 실행 정책 때문에 차단되면 현재 실행에만 정책을 우회하여 실행할 수 있습니다.
+이미 같은 이름이 등록되어 교체해야 하면 먼저 제거한 뒤 다시 등록합니다.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\Register-CodexChromeDevToolsMcp.ps1
-```
-
-스크립트는 사용자 전역 설정인 `~/.codex/config.toml`에 다음 서버를 등록합니다.
-같은 설정이 이미 있으면 아무것도 바꾸지 않습니다. 같은 이름으로 다른 서버가 등록되어
-있을 때만 내용을 확인한 후 `-Force`(Windows) 또는 `--force`(macOS/Ubuntu)로 교체하십시오.
-
-```powershell
-.\scripts\Register-CodexChromeDevToolsMcp.ps1 -Force
-```
-
-```bash
-./scripts/register-codex-chrome-devtools-mcp.sh --force
+codex mcp remove chrome-devtools
 ```
 
 등록 후에는 **VS Code 창을 다시 로드하고 새 Codex 대화**를 시작합니다. 현재 대화에는
@@ -215,8 +197,8 @@ args = -y chrome-devtools-mcp@latest
 | 증상 | 조치 |
 |:--|:--|
 | Claude `/mcp`에 없음 | Claude Code 세션 재시작 |
-| Codex 목록에 없음 | 전역 등록 스크립트를 실행하고 VS Code 창을 다시 로드한 뒤 새 대화 시작 |
-| 저장소를 루트로 열 때만 Codex MCP가 보임 | 전역 등록 스크립트를 실행 (`.\scripts\Register-CodexChromeDevToolsMcp.ps1`) |
+| Codex 목록에 없음 | 전역 등록 명령을 실행하고 VS Code 창을 다시 로드한 뒤 새 대화 시작 |
+| 저장소를 루트로 열 때만 Codex MCP가 보임 | `codex mcp add chrome-devtools -- cmd /c npx -y chrome-devtools-mcp@latest` 실행 |
 | `spawn npx ENOENT` | Windows에서 `cmd /c npx` 사용 |
 | MCP 목록에는 있지만 도구가 없음 | 현재 세션·IDE 확장 재시작 |
 | 패키지 다운로드 실패 | Node.js, `npx`, 네트워크 확인 |
@@ -234,8 +216,6 @@ args = -y chrome-devtools-mcp@latest
 |:--|:--|
 | `.mcp.json` | Claude Code용 MCP 설정 |
 | `.codex/config.toml` | Codex용 프로젝트 MCP 설정 |
-| `scripts/Register-CodexChromeDevToolsMcp.ps1` | Windows용 Codex 전역 등록 스크립트 |
-| `scripts/register-codex-chrome-devtools-mcp.sh` | macOS·Ubuntu용 Codex 전역 등록 스크립트 |
 | `index.html` | 삼목 데모 HTML |
 | `style.css` | 데모 레이아웃과 스타일 |
 | `script.js` | 게임 상태와 버튼 동작 |

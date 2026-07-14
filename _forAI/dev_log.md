@@ -6,6 +6,23 @@
 
 ## Entries
 
+### 2026-07-14 (5) — 전역 등록 안내를 한 줄 명령으로 축소
+
+**시간**: 2026-07-14 15:07:27 +09:00
+
+**결정**: 개인 개발 PC의 최초 등록에는 멱등 등록 스크립트가 과했다. Codex CLI의
+`mcp add` 한 줄이 충분하므로 Windows와 macOS·Linux 전역 등록 스크립트를 제거했다.
+
+**변경**
+
+- Windows: `codex mcp add chrome-devtools -- cmd /c npx -y chrome-devtools-mcp@latest`
+- macOS·Linux: `codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@latest`
+- `readme.md`와 `_forAI` 문서에서 제거된 스크립트 참조를 정리했다.
+
+**검증**: `codex mcp list`에서 `chrome-devtools`가 `enabled`인 것을 확인했다.
+
+---
+
 ### 2026-07-14 (4) — Codex 전역 Chrome DevTools MCP 등록으로 전환
 
 **시간**: 2026-07-14 14:51:31 +09:00

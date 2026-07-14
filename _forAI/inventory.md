@@ -13,15 +13,18 @@
 
 - Name: `ready_chromedev`
 - Path: `c:\works\ready_chromedev`
-- git: 브랜치 `master`. 커밋 1개 — `cd8c714` "정리 전 스냅샷".
+- git: 브랜치 `main`.
 - Summary: **`chrome-devtools-mcp`의 프로젝트·전역 등록과 확인법을 담는 저장소.**
 
 ## Top-level structure
 
 ```
-.mcp.json     chrome-devtools MCP 서버 등록 (project scope). 이 저장소의 전부다.
+.mcp.json     Claude Code용 chrome-devtools MCP 서버 등록 (project scope).
+.codex/       Codex 프로젝트 설정 예시.
 readme.md     Windows·macOS·Ubuntu 설치법 + 확인법.
-scripts/      Codex 전역 등록 스크립트 (Windows, macOS·Ubuntu).
+index.html    삼목 데모 진입점.
+style.css     데모 스타일.
+script.js     데모 동작.
 _forAI/       이 문서 세트.
 .gitignore    node_modules/, _archive/, .claude/
 ```
@@ -49,8 +52,8 @@ _forAI/       이 문서 세트.
 
 Codex 전역 등록:
 
-- Windows: `scripts/Register-CodexChromeDevToolsMcp.ps1`
-- macOS·Ubuntu: `scripts/register-codex-chrome-devtools-mcp.sh`
+- Windows: `codex mcp add chrome-devtools -- cmd /c npx -y chrome-devtools-mcp@latest`
+- macOS·Ubuntu: `codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@latest`
 - 저장 위치: `~/.codex/config.toml` (`CODEX_HOME`을 설정했으면 그 경로)
 - Codex 전역 등록은 상위 폴더를 VS Code 작업 루트로 열어도 MCP를 쓰기 위한 의도적인 결정이다.
 
@@ -73,10 +76,7 @@ codex mcp list                                  # chrome-devtools ... enabled
 
 ## Tests
 
-- Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Register-CodexChromeDevToolsMcp.ps1`
-  를 재실행해 멱등 동작을 확인했다 (2026-07-14).
-- macOS·Ubuntu: 현지에서 `bash -n scripts/register-codex-chrome-devtools-mcp.sh` 후 스크립트를
-  실행해 확인해야 한다. 이 Windows 환경에는 Bash/WSL 배포판이 없었다.
+- `codex mcp list`에서 `chrome-devtools`가 `enabled`인지 확인한다.
 
 ## Notes
 
@@ -84,4 +84,4 @@ codex mcp list                                  # chrome-devtools ... enabled
 - `@latest` 를 쓰므로 버전이 조용히 올라간다. 도구 개수·이름은 `/mcp` 로 확인할 것.
 - 2026-07-09 저장소를 대폭 축소했다. `demo/`, `scripts/`, `slides/`, `docs/` 삭제.
   삭제 직전 상태는 커밋 `cd8c714` 에 전부 들어 있다. 필요하면 거기서 꺼낸다.
-- 2026-07-14 Codex 전역 등록 스크립트 두 개를 `scripts/`에 다시 추가했다.
+- 2026-07-14 Codex 전역 등록은 스크립트 대신 `codex mcp add` 한 줄 명령으로 문서화했다.

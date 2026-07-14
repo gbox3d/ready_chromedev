@@ -31,10 +31,10 @@
 ## 현재 스냅샷
 
 - 저장소 경로: `c:\works\ready_chromedev`
-- git: 브랜치 `master`, 커밋 1개 (`cd8c714` 정리 전 스냅샷)
-- 구성: `.mcp.json` · `readme.md` · `_forAI/` — 코드 없음
+- git: 브랜치 `main`
+- 구성: `.mcp.json` · `.codex/config.toml` · `readme.md` · 정적 데모 파일 · `_forAI/`
 - 플랫폼: Windows 11 Home 26200 / Node v24.18.0 / Chrome 150.0.7871.115 / Claude Code 2.1.193
-- MCP: `chrome-devtools` (project scope, stdio, `@latest` → 1.5.0)
+- MCP: Claude Code는 project scope, Codex는 user/global scope로 `chrome-devtools`를 등록
 
 ## 유지 규칙
 
