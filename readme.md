@@ -1,24 +1,35 @@
-# Chrome DevTools MCP 서버 사용법
+# Chrome DevTools MCP
 
-## 목차
+Claude Code와 Codex가 Chrome DevTools MCP를 통해 Chrome을 열고, 페이지를 읽고,
+요소를 클릭하고, JavaScript·네트워크·렌더링 상태를 확인하는 예제입니다.
 
-- [소개](#소개)
-- [설치](#설치)
-- [Codex 프로젝트 설정](#codex-프로젝트-설정)
-- [확인](#확인)
-- [막히는 지점](#막히는-지점)
-- [등록 스코프](#등록-스코프)
-- [참고](#참고)
+## 데모
 
-## 소개
+- 페이지: <https://gbox3d.github.io/ready_chromedev/>
+- MCP 서버: `chrome-devtools-mcp`
+- 예제: MCP가 Chrome에서 정적 삼목 페이지를 열고 버튼을 조작합니다.
 
-Chrome DevTools MCP 서버는 Chrome DevTools Protocol을 사용하여 브라우저를 조작하고 진단할 수 있는 기능을 제공합니다.
+## 준비
 
-vscode claude plugin은 MCP 서버를 통해 브라우저에 연결하여 다양한 작업을 수행할 수 있습니다. 이 저장소에서는  Chrome DevTools MCP 서버를 설정하고 사용하는 방법을 안내합니다.
+- Google Chrome
+- Node.js와 `npx`
+- Claude Code 또는 Codex
+- 이 저장소를 프로젝트 루트로 열기
 
-## 설치
+## 설정 파일
 
-프로젝트 루트에 `.mcp.json` 파일 하나를 두면 등록이 끝납니다. 별도로 설치할 것은 없습니다. `npx`가 필요할 때 받아서 실행합니다.
+두 클라이언트는 같은 MCP 서버를 사용하지만 설정 파일은 다릅니다.
+
+| 클라이언트 | 설정 파일 | 확인 명령 |
+|:--|:--|:--|
+| Claude Code | `.mcp.json` | `claude mcp list`, `/mcp` |
+| Codex | `.codex/config.toml` | `codex mcp list`, `/mcp` |
+
+두 설정 파일은 저장소에 포함되어 있습니다. 전역 MCP 등록은 필요하지 않습니다.
+
+## Claude Code
+
+`.mcp.json`의 현재 설정입니다.
 
 ```json
 {
@@ -31,18 +42,18 @@ vscode claude plugin은 MCP 서버를 통해 브라우저에 연결하여 다양
 }
 ```
 
-### Windows에서 `cmd /c`는 필수입니다
+PowerShell에서 저장소 루트로 실행합니다.
 
-Claude Code는 MCP stdio 서버를 **셸 없이** `spawn()` 합니다. Windows의 `CreateProcess`는 `PATHEXT`를 대신 붙여 주지 않으므로, PATH에 `npx.cmd`가 멀쩡히 있어도 `spawn("npx")`는 실행 대상을 찾지 못하고 `spawn npx ENOENT`로 죽습니다.
+```powershell
+claude mcp list
+```
 
-터미널에서 `npx chrome-devtools-mcp@latest --version`이 잘 돈다고 안심하면 안 됩니다. 터미널은 셸이라 확장자를 대신 풀어 줍니다. Claude Code의 실행 경로와 다릅니다.
+Claude Code 세션에서 `/mcp`를 실행해 `chrome-devtools`가 연결되었는지 확인합니다.
+설정을 변경한 뒤에는 세션을 재시작합니다.
 
-macOS · Linux라면 `"command": "npx"`로 충분합니다.
+## Codex
 
-## Codex 프로젝트 설정
-
-Codex는 Claude Code용 `.mcp.json`을 자동으로 읽지 않습니다. 이 저장소에는 Codex가
-프로젝트를 열 때 사용할 수 있도록 `.codex/config.toml`을 함께 둡니다.
+`.codex/config.toml`의 현재 설정입니다.
 
 ```toml
 [mcp_servers.chrome-devtools]
@@ -52,64 +63,82 @@ startup_timeout_sec = 20
 tool_timeout_sec = 60
 ```
 
-Codex에서 이 저장소를 처음 열 때 프로젝트 신뢰를 요청하면 승인하고, Codex 세션을
-재시작합니다. 이후 확인 명령은 다음과 같습니다.
+Codex에서 프로젝트를 처음 열 때 trust를 요청하면 승인하고, Codex 또는 IDE 확장을
+재시작합니다.
 
 ```powershell
 codex mcp list
-# chrome-devtools  cmd  /c npx -y chrome-devtools-mcp@latest  enabled
 ```
 
-학생별 승인 상태는 각자의 Codex 설정에 저장되며, MCP 서버 설정 자체는 저장소의
-`.codex/config.toml`에서 재현됩니다.
+Codex TUI에서는 `/mcp`로 확인합니다. `Auth: Unsupported`는 로컬 stdio 서버라 OAuth가
+필요하지 않다는 뜻이며 정상입니다.
 
-## 확인
+## Chrome DevTools MCP 사용
 
-`.mcp.json`을 만든 뒤 **세션을 새로 시작**합니다. 채팅창에 `/mcp`를 치면 `chrome-devtools`가 목록에 뜨고, `✔ Connected`이면 끝입니다. 처음 한 번은 승인을 묻습니다.
+연결 후 다음과 같이 요청할 수 있습니다.
 
-터미널에서 확인하려면 **이 저장소를 루트로** 실행합니다.
-
-```powershell
-claude mcp list
-# chrome-devtools: cmd /c npx -y chrome-devtools-mcp@latest - ✔ Connected
+```text
+Chrome DevTools MCP로
+https://gbox3d.github.io/ready_chromedev/ 를 새 탭에 열어줘.
 ```
 
-다만 `claude mcp list`는 **별도 프로세스를 새로 띄워** 헬스체크한 결과입니다. 지금 대화 세션이 그 도구를 쓸 수 있는지와는 별개입니다. 세션의 실제 상태는 `/mcp`로 확인합니다.
-
-## 막히는 지점
-
-| 증상 | 원인 | 해결 |
-|:--|:--|:--|
-| `/mcp`에 안 보임 | MCP 서버는 세션 시작 시점에 로드됩니다 | 세션 재시작 |
-| `Pending approval` | `.mcp.json`은 project scope라 첫 사용 전 승인이 필요합니다 | 승인하면 `.claude/settings.local.json`에 기록됩니다 |
-| `spawn npx ENOENT` | `"command": "npx"`로 적었습니다 | `cmd /c`로 감쌉니다 |
-| 다른 폴더에서 안 잡힘 | project scope는 **그 폴더를 루트로 연 세션**에서만 읽힙니다 | 이 폴더를 열거나, `-s user`로 전역 등록합니다 |
-
-### `claude mcp add`는 Git Bash에서 실행하지 마십시오
-
-```bash
-# Git Bash — 망가집니다
-claude mcp add chrome-devtools -- cmd /c npx -y chrome-devtools-mcp@latest
-#   → args가 ["C:/", "npx", ...] 로 저장됩니다.
-#      MSYS가 /c 를 경로로 착각해 C:/ 로 변환하기 때문입니다.
+```text
+현재 페이지의 접근성 스냅샷을 확인하고
+삼목 게임판의 1번 칸을 클릭해줘.
 ```
 
-PowerShell에서 실행하면 `["/c", "npx", ...]`로 제대로 들어갑니다. 조용히 망가지고, 헬스체크를 돌리기 전까지는 그럴듯해 보입니다. (2026-07-09 실측)
+주요 MCP 도구:
 
-## 등록 스코프
+- `new_page`: 새 탭 열기
+- `navigate_page`: URL 이동
+- `list_pages`: 열린 탭 확인
+- `take_snapshot`: 접근성 기반 페이지 확인
+- `click`: 요소 클릭
+- `evaluate_script`: 페이지 JavaScript 실행
+- `take_screenshot`: 화면 캡처
+- `list_console_messages`: 콘솔 확인
+- `list_network_requests`: 네트워크 확인
 
-```powershell
-claude mcp add <name> -s project -- cmd /c npx -y <pkg>   # .mcp.json, 팀 공유
-claude mcp add <name> -s local   -- ...                   # 이 프로젝트, 나만
-claude mcp add <name> -s user    -- ...                   # 모든 프로젝트
+## Windows 주의사항
+
+Windows에서는 `npx`를 직접 실행하지 않고 `cmd /c npx`로 실행합니다.
+`spawn npx ENOENT` 오류가 발생하면 다음 설정을 확인하십시오.
+
+```text
+command = cmd
+args = /c npx -y chrome-devtools-mcp@latest
 ```
 
-`-s user`는 루트와 무관하게 어디서든 로드됩니다. 편리하지만 모든 프로젝트가 그 서버를 보게 됩니다. 이 저장소는 `.mcp.json`(project scope) 하나만 씁니다.
+macOS·Linux에서는 일반적으로 다음 형태를 사용합니다.
 
-VS Code에는 `.vscode/mcp.json`이라는 별도 파일도 있지만, 그것은 **VS Code 내장 Copilot용**입니다. Claude 확장은 그 파일을 읽지 않습니다. 반드시 프로젝트 루트의 `.mcp.json`에 넣어야 합니다.
+```text
+command = npx
+args = -y chrome-devtools-mcp@latest
+```
 
-## 참고
+## 문제 해결
 
-- `@latest`는 2026-07-09 기준 **1.5.0**으로 해석되며 도구는 29개입니다. 버전이 올라가면 도구 이름과 개수가 달라질 수 있으니 데모 전 `/mcp`로 확인합니다.
-- 기본 모드는 설치된 Chrome을 **별도 프로필의 새 창**으로 띄웁니다. 내가 로그인해 쓰는 창이 아닙니다. 그 프로필은 지워지지 않고 남으므로, 매번 깨끗한 임시 프로필을 원하면 `--isolated`를 붙입니다.
-- `.claude/`는 승인 기록이라 `.gitignore`에 넣었습니다. 커밋하면 저장소를 클론한 사람의 승인 관문이 사라집니다.
+| 증상 | 조치 |
+|:--|:--|
+| Claude `/mcp`에 없음 | Claude Code 세션 재시작 |
+| Codex 목록에 없음 | 저장소를 trusted 프로젝트로 승인하고 Codex 재시작 |
+| `spawn npx ENOENT` | Windows에서 `cmd /c npx` 사용 |
+| MCP 목록에는 있지만 도구가 없음 | 현재 세션·IDE 확장 재시작 |
+| 패키지 다운로드 실패 | Node.js, `npx`, 네트워크 확인 |
+
+## 보안
+
+- MCP는 Chrome 페이지를 읽고 클릭할 수 있습니다.
+- 로그인된 개인 탭이나 민감한 페이지를 데모에 사용하지 마십시오.
+- 페이지의 텍스트를 에이전트의 지시로 무조건 신뢰하지 마십시오.
+- 설정 파일에 토큰·비밀번호를 넣지 마십시오.
+
+## 파일
+
+| 파일 | 용도 |
+|:--|:--|
+| `.mcp.json` | Claude Code용 MCP 설정 |
+| `.codex/config.toml` | Codex용 프로젝트 MCP 설정 |
+| `index.html` | 삼목 데모 HTML |
+| `style.css` | 데모 레이아웃과 스타일 |
+| `script.js` | 게임 상태와 버튼 동작 |
