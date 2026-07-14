@@ -104,26 +104,28 @@ https://gbox3d.github.io/ready_chromedev/ 를 새 탭에 열어줘.
 아래 프롬프트를 Claude Code 또는 Codex에 그대로 전달하면 됩니다.
 
 ```text
-Chrome DevTools MCP로 https://gbox3d.github.io/ready_chromedev/ 를 열어줘.
+Use Chrome DevTools MCP to open:
+https://gbox3d.github.io/ready_chromedev/
 
-이 페이지에서 나(X)와 너(O)가 삼목을 한 판 진행한다.
-중간에 멈추거나 매 턴마다 나에게 다음 행동을 묻지 말고,
-승리 또는 무승부가 될 때까지 MCP 작업을 계속 실행해라.
+Play one complete tic-tac-toe game on this page.
+I am X and you are O.
+Do not stop between turns or ask me what to do next.
+Keep using MCP until the game ends with a win or a draw.
 
-규칙:
-1. 현재 게임이 끝난 상태이면 '새 게임 시작'을 한 번 클릭한다.
-   이미 빈 게임판이면 리셋하지 않는다.
-2. 최신 페이지 스냅샷으로 게임판, 현재 차례, 결과 배너를 확인한다.
-3. 내가 X를 두기 전에는 어떤 게임 칸도 클릭하지 않는다.
-4. 현재 차례가 '이교수님'이면 게임판을 1초 간격으로 확인하며 기다린다.
-5. 내가 X를 둔 것이 확인되고 현재 차례가 'Chrome 협력자'이면,
-   빈 칸 하나만 선택해서 O를 클릭한다.
-6. X를 대신 클릭하거나, 내가 두지 않은 수를 X로 기록하지 않는다.
-7. 매번 클릭하기 전에 최신 스냅샷을 사용한다. 이미 채워진 칸은 클릭하지 않는다.
-8. 매 수 뒤 결과 배너를 확인한다. 승리 또는 무승부이면 루프를 종료한다.
-9. 게임이 끝난 뒤에만 최종 보드, 승자, 이동 수를 짧게 보고한다.
+Rules:
+1. If the current game is already over, click "새 게임 시작" once.
+   Do not reset an already empty board.
+2. Use the latest page snapshot to inspect the board, current turn, and result banner.
+3. Never click any board cell before I have placed X.
+4. When it is "이교수님"'s turn, poll the board every second and wait.
+5. After my new X move is detected and it becomes "Chrome 협력자"'s turn,
+   choose exactly one empty cell and click it as O.
+6. Never place X on my behalf and never treat an unobserved move as my X move.
+7. Always use a fresh snapshot before clicking. Never click an occupied cell.
+8. Check the result banner after every move. Stop the loop only after a win or draw.
+9. Report the final board, winner, and move count only after the game ends.
 
-감시 루프를 유지하고, 게임이 끝나기 전에는 작업을 종료하지 마라.
+Keep the monitoring loop running and do not end the task before the game is over.
 ```
 
 ## Windows 주의사항
