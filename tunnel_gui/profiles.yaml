@@ -1,0 +1,11 @@
+version: 1
+active_profile: dgx-01
+profiles:
+  dgx-01:
+    backend_host: 192.168.0.220
+    backend_port: 8000
+    ssh_user: gblab-dgx-01
+    ssh_host: gblab-dgx-01
+    chrome_debug_port: 9333
+    remote_debug_port: 9222
+    chrome_profile: ''
