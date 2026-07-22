@@ -4,15 +4,14 @@ from pathlib import Path
 
 import yaml
 
-from .tunnel import TunnelConfig
+from .devtools import DevToolsConfig
 
 
 DEFAULT_PROFILE_NAME = "dgx-01"
-DEFAULT_CONFIG = TunnelConfig(
+DEFAULT_CONFIG = DevToolsConfig(
     backend_host="192.168.0.220",
     backend_port=8000,
-    ssh_user="gblab-dgx-01",
-    ssh_host="gblab-dgx-01",
+    ssh_target="gblab-dgx-01",
     chrome_debug_port=9333,
     remote_debug_port=9222,
     chrome_profile="",
@@ -32,7 +31,7 @@ class ProfileStore:
     def __init__(self, path: Path) -> None:
         self.path = path
         self.active_profile = DEFAULT_PROFILE_NAME
-        self.profiles: dict[str, TunnelConfig] = {}
+        self.profiles: dict[str, DevToolsConfig] = {}
 
     def load(self) -> None:
         if not self.path.exists():
@@ -48,12 +47,12 @@ class ProfileStore:
         if not isinstance(raw_profiles, dict) or not raw_profiles:
             raise ValueError("profiles에는 하나 이상의 프로파일이 필요합니다.")
 
-        loaded: dict[str, TunnelConfig] = {}
+        loaded: dict[str, DevToolsConfig] = {}
         for raw_name, raw_config in raw_profiles.items():
             name = validate_profile_name(str(raw_name))
             if not isinstance(raw_config, dict):
                 raise ValueError(f"프로파일 '{name}' 설정은 mapping이어야 합니다.")
-            loaded[name] = TunnelConfig.from_mapping(raw_config)
+            loaded[name] = DevToolsConfig.from_mapping(raw_config)
 
         active = str(payload.get("active_profile", "")).strip()
         self.profiles = loaded
@@ -75,7 +74,7 @@ class ProfileStore:
         )
         temporary.replace(self.path)
 
-    def save_profile(self, name: str, config: TunnelConfig) -> None:
+    def save_profile(self, name: str, config: DevToolsConfig) -> None:
         name = validate_profile_name(name)
         self.profiles[name] = config
         self.active_profile = name

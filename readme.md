@@ -3,6 +3,9 @@
 Claude Code와 Codex가 Chrome DevTools MCP를 통해 Chrome을 열고, 페이지를 읽고,
 요소를 클릭하고, JavaScript·네트워크·렌더링 상태를 확인하는 예제입니다.
 
+이 저장소의 정체성은 **DevTools MCP 실행·연결 예제**입니다. `gui_tool`은 MCP 서버를 대체하지 않고,
+MCP가 연결할 로컬 Chrome CDP 또는 SSH 역터널 CDP 엔드포인트를 준비합니다.
+
 ## 데모
 
 - 페이지: <https://gbox3d.github.io/ready_chromedev/>
@@ -146,7 +149,38 @@ https://gbox3d.github.io/ready_chromedev/ 를 새 탭에 열어줘.
 - `list_console_messages`: 콘솔 확인
 - `list_network_requests`: 네트워크 확인
 
-## SSH 역터널로 원격 서버에서 이 PC의 Chrome 연결
+## 로컬 DevTools MCP 연결 구조
+
+기본 설정처럼 `chrome-devtools-mcp`를 `--browser-url` 없이 실행하면 MCP가 자체 Chrome을 시작할 수
+있습니다. `gui-tool`의 `로컬 DevTools MCP` 탭이 시작한 전용 Chrome을 사용하려면 MCP에
+`--browser-url=http://127.0.0.1:9222`를 지정합니다. 로컬 탭은 프로파일 없이 개발 서버
+`http://localhost:8000/`과 Chrome CDP `9222`를 기본값으로 사용합니다.
+
+```mermaid
+flowchart LR
+    subgraph LOCAL["이 PC"]
+        CLIENT["Claude Code / Codex"]
+        MCP["chrome-devtools-mcp<br/>stdio MCP 서버"]
+        GUI["gui-tool<br/>로컬 DevTools MCP 탭"]
+        CHROME["전용 Chrome<br/>CDP 127.0.0.1:9222"]
+    end
+
+    CLIENT <-->|"MCP stdio"| MCP
+    GUI -->|"Chrome 실행·상태 관리"| CHROME
+    MCP -->|"--browser-url=http://127.0.0.1:9222"| CHROME
+```
+
+Windows용 MCP 인자는 다음과 같습니다.
+
+```text
+command = cmd
+args = /c npx -y chrome-devtools-mcp@latest --browser-url=http://127.0.0.1:9222
+```
+
+이 경우의 연결 방향은 `AI 클라이언트 → stdio MCP 서버 → 로컬 CDP :9222`입니다. GUI는 Chrome의
+수명 주기와 로컬 시작 URL을 관리하고, MCP는 CDP를 통해 페이지·콘솔·네트워크·성능 도구를 제공합니다.
+
+## 원격 DevTools MCP 연결 구조: SSH 역터널
 
 원격 서버에서 실행되는 MCP나 개발 도구가 이 Windows PC의 Chrome DevTools에 접속해야 할 때
 SSH 역방향 포트 포워딩(`ssh -R`)을 사용합니다.
@@ -154,13 +188,14 @@ SSH 역방향 포트 포워딩(`ssh -R`)을 사용합니다.
 ```mermaid
 flowchart LR
     subgraph WIN["이 PC (Windows)"]
-        GUI["Tkinter GUI<br/>TunnelRunner"]
+        GUI["gui-tool<br/>SSH 역터널 MCP 탭"]
         SSH["OpenSSH client<br/>ssh -NT -R"]
         CHROME["전용 Chrome<br/>DevTools :9333"]
     end
 
     subgraph REMOTE["원격 서버"]
-        TOOL["원격 MCP / 개발 도구"]
+        CLIENT["Claude Code / Codex"]
+        MCP["chrome-devtools-mcp"]
         PORT["loopback :9222"]
         SSHD["SSH server"]
     end
@@ -168,7 +203,8 @@ flowchart LR
     GUI -->|"Chrome 실행·상태 확인"| CHROME
     GUI -->|"터널 시작·중지"| SSH
     SSH -->|"SSH 연결"| SSHD
-    TOOL -->|"HTTP 요청"| PORT
+    CLIENT <-->|"MCP stdio"| MCP
+    MCP -->|"--browser-url=http://127.0.0.1:9222"| PORT
     PORT -->|"reverse forward<br/>127.0.0.1:9222 → 127.0.0.1:9333"| CHROME
 ```
 
@@ -182,36 +218,50 @@ flowchart LR
 그 결과 원격 서버의 프로그램은 `http://127.0.0.1:9222`로 접속하지만, 트래픽은 SSH 연결을
 거슬러 올라와 이 PC의 `127.0.0.1:9333`에서 실행 중인 Chrome DevTools로 전달됩니다.
 원격 포트도 loopback 주소에만 바인딩하므로 원격 서버 외부에 DevTools 포트를 공개하지 않습니다.
+원격 서버의 MCP는 다음 인자로 역터널의 CDP 엔드포인트를 사용합니다.
+
+```text
+chrome-devtools-mcp --browser-url=http://127.0.0.1:9222
+```
 
 ### 사전 준비
 
 - Windows에 Google Chrome, OpenSSH Client, `uv`가 있어야 합니다.
 - 원격 서버의 SSH 데몬에서 TCP forwarding을 허용해야 합니다.
-- `~/.ssh/config`에 `Host gblab-dgx-01` 같은 별칭을 정의했다면 GUI의 `SSH Host 별칭`에
-  그 값을 입력해야 `IdentityFile`, `IdentitiesOnly` 등의 설정이 적용됩니다.
+- `~/.ssh/config`에 `Host gblab-dgx-01` 같은 별칭을 정의했다면 GUI의 `SSH 대상`에
+  그 값을 입력해야 `IdentityFile`, `IdentitiesOnly` 등의 설정이 적용됩니다. 별칭을 사용하지 않으면
+  `user@host` 형식으로 입력합니다.
 - GUI는 대화형 암호 입력을 받지 않으므로 SSH 키 또는 `ssh-agent` 인증을 사용합니다.
 - 처음 연결하는 서버라면 터미널에서 `ssh Host별칭`을 한 번 실행해 호스트 키를 확인합니다.
 
-### Tkinter GUI로 관리
+### 통합 GUI로 관리
 
-독립 앱 디렉터리에서 실행합니다. `uv`가 Python 환경과 PyYAML 의존성을 준비합니다.
+독립 앱은 `로컬 DevTools MCP`와 `SSH 역터널 MCP` 두 탭을 제공합니다. 로컬 탭은 프로파일 없이
+`localhost:8000`과 Chrome CDP `9222`만 사용합니다. 역터널 탭에서만 프로파일을 선택하고 이 PC의
+CDP `9333`을 원격 서버의 loopback `9222`로 연결합니다. `uv`가 Python 환경과 PyYAML 의존성을
+준비합니다.
 
 ```powershell
-cd .\tunnel_gui
+cd .\gui_tool
 uv sync
-uv run python -m chrome_tunnel_gui
+uv run gui-tool
 ```
 
-GUI에서 백엔드 호스트·웹 포트·SSH 사용자·SSH Host 별칭·양쪽 DevTools 포트를 입력하고
-`터널 시작`을 누릅니다. 앱은 PowerShell 스크립트 없이 Python에서 Chrome과 OpenSSH를 직접
-실행하고 로그와 상태를 표시합니다. 설정은 `tunnel_gui/profiles.yaml`에 프로파일 단위로
-저장되며 GUI에서 선택·생성·저장·삭제할 수 있습니다.
+모듈 방식으로 실행하려면 `uv run python -m gui_tool`도 사용할 수 있습니다.
 
-`터널 중지`를 누르면 이번 실행에서 앱이 연 전용 Chrome과 그 자식 프로세스도 함께 닫습니다.
+GUI에서 연결 구조에 맞는 탭을 선택합니다. 로컬 탭에는 localhost 기반의 최소 인자만, 역터널 탭에는
+프로파일과 Chrome/CDP 인자, SSH 대상(별칭 또는 `user@host`)·원격 CDP 포트가 표시됩니다. 각 탭은
+MCP에 전달할 `--browser-url` 값도 보여 줍니다. 앱은 Python에서 Chrome과 OpenSSH를 직접 실행하고
+로그와 상태를 표시합니다.
+역터널 설정만 `gui_tool/profiles.yaml`에 프로파일 단위로 저장되며 GUI에서 선택·생성·저장·삭제할 수
+있습니다.
+
+`로컬 Chrome 중지` 또는 `역터널 중지`를 누르면 이번 실행에서 앱이 연 전용 Chrome과 그 자식
+프로세스도 함께 닫습니다.
 앱 시작 전에 이미 실행 중이던 Chrome이나 사용자의 일반 Chrome 프로필은 종료하지 않습니다.
 
-`AI 협업용 현재 상태 설명` 영역의 문장은 선택한 프로파일과 현재 연결 방향을 설명하며,
-버튼으로 복사할 수 있습니다. 상세 구조와 YAML 형식은 `tunnel_gui/README.md`에 있습니다.
+`AI 전달용 MCP 연결 정보` 영역에는 현재 상태, CDP 주소와 MCP `--browser-url` 인자만 표시되며
+버튼으로 복사할 수 있습니다. 상세 구조와 YAML 형식은 `gui_tool/README.md`에 있습니다.
 
 원격 서버에서는 다음 응답으로 연결을 확인합니다.
 
@@ -294,8 +344,8 @@ args = -y chrome-devtools-mcp@latest
 |:--|:--|
 | `.mcp.json` | Claude Code용 MCP 설정 |
 | `.codex/config.toml` | Codex용 프로젝트 MCP 설정 |
-| `tunnel_gui/` | 독립 Python·uv·Tkinter SSH 역터널 관리자 |
-| `tunnel_gui/profiles.yaml` | 프로파일별 터널 설정 |
+| `gui_tool/` | 로컬·역터널 Chrome CDP를 준비하는 DevTools MCP 연결 관리자 |
+| `gui_tool/profiles.yaml` | SSH 역터널 전용 프로파일 설정 |
 | `index.html` | 삼목 데모 HTML |
 | `style.css` | 데모 레이아웃과 스타일 |
 | `script.js` | 게임 상태와 버튼 동작 |

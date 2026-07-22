@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from chrome_tunnel_gui.profiles import DEFAULT_CONFIG, DEFAULT_PROFILE_NAME, ProfileStore
+from gui_tool.profiles import DEFAULT_CONFIG, DEFAULT_PROFILE_NAME, ProfileStore
 
 
 class ProfileStoreTests(unittest.TestCase):

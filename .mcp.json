@@ -3,6 +3,19 @@
     "chrome-devtools": {
       "command": "cmd",
       "args": ["/c", "npx", "-y", "chrome-devtools-mcp@latest"]
+    },
+    "gui-tool": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "uv",
+        "--directory",
+        "C:\\works\\ready_chromedev\\gui_tool",
+        "run",
+        "python",
+        "-m",
+        "gui_tool.mcp_server"
+      ]
     }
   }
 }

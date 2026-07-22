@@ -3,9 +3,9 @@ revision = 3
 requires-python = ">=3.11"
 
 [[package]]
-name = "chrome-devtools-tunnel-gui"
-version = "0.2.0"
-source = { virtual = "." }
+name = "chrome-devtools-gui-tool"
+version = "0.4.0"
+source = { editable = "." }
 dependencies = [
     { name = "pyyaml" },
 ]
